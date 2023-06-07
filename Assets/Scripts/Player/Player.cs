@@ -10,6 +10,10 @@ public class Player : MonoBehaviour
     [SerializeField] Rigidbody2D rigidbody2D;
     [SerializeField] GameObject SlimePrefab;
     [SerializeField] int numberOfSlimes;
+    [SerializeField] Transform slimeRespawnTransform;
+    [SerializeField] LayerMask spaceToSlimeMask;
+
+    Action<Color> OnCollorChange;
     public Color Color
     {
         get { return color; }
@@ -24,18 +28,26 @@ public class Player : MonoBehaviour
     SlimeController slimeController;
     SpaceForSlimeChecker spaceForSlimeChecker;
 
-
+    //start de prueba
     private void Awake()
     {
+        Initialize(color);
+    }
+
+    public void Initialize(Color color)
+    {
+        Color= color;
         moveInputHandler = new MoveInputHandler(transform,rigidbody2D);
-        slimeController = new SlimeController(GenerateThisNumberOfSlimes(numberOfSlimes));
-        spaceForSlimeChecker = new SpaceForSlimeChecker(transform);
+        spaceForSlimeChecker = new SpaceForSlimeChecker(slimeRespawnTransform,spaceToSlimeMask);
+        slimeController = new SlimeController(GenerateThisNumberOfSlimes(numberOfSlimes), spaceForSlimeChecker);
+       
     }
 
 
     private void Update()
     {
         moveInputHandler.SetMovement();
+        slimeController.PlaceSlime();
     }
 
     private void FixedUpdate()
@@ -44,13 +56,14 @@ public class Player : MonoBehaviour
     }
 
 
-    private List<Slime> GenerateThisNumberOfSlimes(int number)
+    List<Slime> GenerateThisNumberOfSlimes(int number)
     {
         var slimes = new List<Slime>();
-
         for(int i=0; i < number; i++)
         {
-            slimes.Add(Instantiate(SlimePrefab, Vector2.zero, Quaternion.identity).GetComponent<Slime>());
+            var slime = Instantiate(SlimePrefab, Vector2.zero, Quaternion.identity).GetComponent<Slime>();
+            slime.SetColor(color);
+            slimes.Add(slime);            
         }
         return slimes;
     }

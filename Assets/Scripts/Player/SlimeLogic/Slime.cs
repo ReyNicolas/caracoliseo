@@ -16,10 +16,19 @@ public class Slime : MonoBehaviour
         spriteRenderer.color = color;
     }
 
+    public void SetPosition(Vector2 position) 
+    {
+        transform.position = position;
+        SetTimeGenerated();
+    }
+
+
 
     private void OnEnable()
     {
-        timeGenerated = Time.realtimeSinceStartup;
+        SetTimeGenerated();
     }
 
+     void SetTimeGenerated() => 
+        timeGenerated = Time.realtimeSinceStartup;
 }
